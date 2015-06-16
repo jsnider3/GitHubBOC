@@ -1,7 +1,13 @@
 "use strict";
 var GitHubApi = require("github");
-var http = require('http');
-http.createServer(function (req, res) {
+var https = require('https');
+var fs = require('fs');
+var options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+
+https.createServer(options, function (req, res) {
   if (req.url != "/favicon.ico") {
     var user = require('url').parse(req.url, true).query.user;
     if (typeof user === 'undefined') {
@@ -22,7 +28,7 @@ http.createServer(function (req, res) {
     github.authenticate({
       type: "basic",
       username: "jsnider3",
-      password: redacted
+      password: "JLSjls123%"
     });
     github.repos.getFromUser({user: user}, function(err, resp) {
       var links = resp.map(function (repo) {
@@ -65,4 +71,4 @@ http.createServer(function (req, res) {
     });
   }
 }).listen(1337, '127.0.0.1');
-console.log('Server running at http://127.0.0.1:1337/');
+console.log('Server running at https://127.0.0.1:1337/');
