@@ -2,61 +2,77 @@
 <html>
 <head>
 
+<script src="http://code.jquery.com/jquery.min.js"></script>
 <script type="text/javascript">
-function doSomething() {
+var github = "https://api.github.com";
+
+function makeRequest(url, callback) {
   var request = new XMLHttpRequest();
-  request.onload = repoCallback;
-  request.open('get', 'https://api.github.com/users/jsnider3/repos', true);
-  request.send()
+  request.onload = callback;
+  var username = document.getElementById('user');
+  request.open('get', url,
+    true);
+  //TODO FIXME
+  //request.setRequestHeader("User-Agent", "jsnider3");
+  return request
+}
+
+function main() {
+  //var request = makeRequest(github + "/users/" + username + "/repos",
+  //                  repoCallback);
+  //request.send();
+  repoCallback();
 }
 
 function repoCallback() {
-  document.getElementById('results').value = this.responseText;
-  /*github.repos.getFromUser({user: user}, function(err, resp) {
-    var links = resp.map(function (repo) {
+  //var repos = JSON.parse(this.responseText);
+  $.getJSON("./repos.json", function (repos) {
+    var links = repos.map(function (repo) {
       return repo.full_name;
     });
+    document.getElementById('results').value = links.join();
     var count = links.length;
     var progmaps = {};
     links.map(function (link) {
-      var arr = link.split("/");
+      var langUrl = github + "/repos/" + link + "/languages"
+      var request = makeRequest(langUrl, undefined)
+      console.log(langUrl);
       //For each repo.
-      var opts = {user: arr[0], repo: arr[1]};
-      github.repos.getLanguages(opts, function(err, resp) {
-        delete resp.meta;
-        if (Object.keys(resp).length == 0) {
-          count = count - 1;
-        } else {
-          //Keep track of how much code was written in each language.
-          Object.keys(resp).forEach(function (k) {
-            if (k in progmaps) {
-              progmaps[k] += resp[k];
-            } else {
-              progmaps[k] = resp[k];
+      /*  github.repos.getLanguages(opts, function(err, resp) {
+          delete resp.meta;
+          if (Object.keys(resp).length == 0) {
+            count = count - 1;
+          } else {
+            //Keep track of how much code was written in each language.
+            Object.keys(resp).forEach(function (k) {
+              if (k in progmaps) {
+                progmaps[k] += resp[k];
+              } else {
+                progmaps[k] = resp[k];
+              }
+            });
+            count = count - 1;
+            if (count == 0) {
+              //Done, sort them, and return them.
+              var langs = Object.keys(progmaps).map(function (k) {
+                return {lang: k, bytes: progmaps[k]};
+              });
+              langs.sort(function(a, b) {
+                return b.bytes - a.bytes;
+              });
+              console.log(langs);
             }
-          });
-          count = count - 1;
-          if (count == 0) {
-            //Done, sort them, and return them.
-            var langs = Object.keys(progmaps).map(function (k) {
-              return {lang: k, bytes: progmaps[k]};
-            });
-            langs.sort(function(a, b) {
-              return b.bytes - a.bytes;
-            });
-            console.log(langs);
-            res.end(JSON.stringify(langs));
           }
-        }
-      });
+        });
+      });*/
     });
-  });*/
+  });
 }
 </script>
 </head>
 <body>
 <input type="text" id="user" onkeydown="if (event.keyCode == 13) document.getElementById('btnSearch').click()"/>
-<input type="button" id="btnSearch" value="Search" onclick="doSomething();" />
+<input type="button" id="btnSearch" value="Search" onclick="main();" />
 <input type="text" id="results" />
 </body>
 </html>
