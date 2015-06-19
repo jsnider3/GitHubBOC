@@ -1,78 +1,17 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+  </head>
+  <body ng-app="GitHubSLOC" ng-controller="MainController">
+    <input type="text" id="user" />
+    <input type="button" id="btnSearch" value="Search" ng-click="main()" />
+    <input type="text" id="results" />
 
-<script src="http://code.jquery.com/jquery.min.js"></script>
-<script type="text/javascript">
-var github = "https://api.github.com";
+    <script src="js/app.js"></script>
 
-function makeRequest(url, callback) {
-  var request = new XMLHttpRequest();
-  request.onload = callback;
-  var username = document.getElementById('user');
-  request.open('get', url,
-    true);
-  //TODO FIXME
-  //request.setRequestHeader("User-Agent", "jsnider3");
-  return request
-}
-
-function main() {
-  //var request = makeRequest(github + "/users/" + username + "/repos",
-  //                  repoCallback);
-  //request.send();
-  repoCallback();
-}
-
-function repoCallback() {
-  //var repos = JSON.parse(this.responseText);
-  $.getJSON("./repos.json", function (repos) {
-    var links = repos.map(function (repo) {
-      return repo.full_name;
-    });
-    document.getElementById('results').value = links.join();
-    var count = links.length;
-    var progmaps = {};
-    links.map(function (link) {
-      var langUrl = github + "/repos/" + link + "/languages"
-      var request = makeRequest(langUrl, undefined)
-      console.log(langUrl);
-      //For each repo.
-      /*  github.repos.getLanguages(opts, function(err, resp) {
-          delete resp.meta;
-          if (Object.keys(resp).length == 0) {
-            count = count - 1;
-          } else {
-            //Keep track of how much code was written in each language.
-            Object.keys(resp).forEach(function (k) {
-              if (k in progmaps) {
-                progmaps[k] += resp[k];
-              } else {
-                progmaps[k] = resp[k];
-              }
-            });
-            count = count - 1;
-            if (count == 0) {
-              //Done, sort them, and return them.
-              var langs = Object.keys(progmaps).map(function (k) {
-                return {lang: k, bytes: progmaps[k]};
-              });
-              langs.sort(function(a, b) {
-                return b.bytes - a.bytes;
-              });
-              console.log(langs);
-            }
-          }
-        });
-      });*/
-    });
-  });
-}
-</script>
-</head>
-<body>
-<input type="text" id="user" onkeydown="if (event.keyCode == 13) document.getElementById('btnSearch').click()"/>
-<input type="button" id="btnSearch" value="Search" onclick="main();" />
-<input type="text" id="results" />
-</body>
+    <!-- Controllers -->
+    <script src="js/controllers/MainController.js"></script>
+  </body>
 </html>
