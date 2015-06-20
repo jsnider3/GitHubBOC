@@ -1,63 +1,62 @@
 app.controller('MainController', 
                ['$scope', '$http', function($scope, $http) {
                   $scope.github = "https://api.github.com",
-                  $scope.makeRequest = function (url, callback) {
-                    var request = new XMLHttpRequest();
-                    request.onload = callback;
-                    var username = document.getElementById('user');
-                    request.open('get', url,
-                      true);
-                    //TODO FIXME
-                    //request.setRequestHeader("User-Agent", "jsnider3");
-                    return request
-                  },
-
                   $scope.main = function () {
-                    //var request = makeRequest(github + "/users/" + username + "/repos",
-                    //                  repoCallback);
-                    //request.send();
-                    $scope.repoCallback();
+                    var gitUrl = "./repos.json"
+                    //var gitUrl = $scope.github + "/users/" + username + "/repos"
+                    $http.get(gitUrl).then(function(resp) {
+                      $scope.repoCallback(resp.data)
+                    })
                   },
 
-                  $scope.repoCallback = function() {
-                    $.getJSON("./repos.json", function (repos) {
+                  $scope.repoCallback = function(repos) {
                     var links = repos.map(function (repo) {
                       return repo.full_name;
                     });
                     document.getElementById('results').value = links.join();
                     var count = links.length;
                     var progmaps = {};
-                    links.map(function (link) {
-                      var langUrl = $scope.github + "/repos/" + link + "/languages"
-                      var request = $scope.makeRequest(langUrl, undefined)
-                      console.log(langUrl);
+                    links.forEach(function (link) {
                       //For each repo.
-                      $http.get(langUrl).then(function(resp) {console.log(resp.data)}).catch(function(foo) {});
-                      /*delete resp.meta;
-                        if (Object.keys(resp).length == 0) {
-                          count = count - 1;
-                        } else {
+                      //var langUrl = $scope.github + "/repos/" + link + "/languages"
+                      var langUrl = "./" + link + ".json"
+                      //console.log(langUrl)
+                      $http.get(langUrl).then(function(resp) {
+                        var langs = resp.data
+                        console.log(langs)
+                        count--;
+                        if (Object.keys(langs).length > 0) {
                           //Keep track of how much code was written in each language.
-                          Object.keys(resp).forEach(function (k) {
+                          //TODO Rewrite this garbage.
+                          Object.keys(langs).forEach(function (k) {
                             if (k in progmaps) {
-                              progmaps[k] += resp[k];
+                              progmaps[k][link] = langs[k]//+= langs[k];
                             } else {
-                              progmaps[k] = resp[k];
+                              progmaps[k] = {}
+                              progmaps[k][link] = langs[k];
                             }
                           });
-                          count = count - 1;
+                          
                           if (count == 0) {
+                            var order = Objects.key(progmaps).sort(function (a, b) {
+                              var sum = function(k) {
+                                
+                              }
+                              return sum(b) - sum(a);
+                            });
                             //Done, sort them, and return them.
-                            var langs = Object.keys(progmaps).map(function (k) {
+                            /*var langs = Object.keys(progmaps).map(function (k) {
                               return {lang: k, bytes: progmaps[k]};
                             });
                             langs.sort(function(a, b) {
                               return b.bytes - a.bytes;
-                            });
-                            console.log(langs);
+                            });*/
+                            console.log("Order")
+                            console.log(order)
+                            console.log("Data")
+                            console.log(progmaps);//langs);
                           }
                         }
-                        });*/
                       });
                     });
                   };
