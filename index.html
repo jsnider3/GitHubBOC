@@ -3,11 +3,15 @@
   <head>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
     <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.v3.min.js"></script>
+    <script type="text/javascript" src=https://cdn.rawgit.com/Imaginea/uvCharts/master/dist/uvcharts.min.js></script>
   </head>
   <body ng-app="GitHubSLOC" ng-controller="MainController">
+
+    <div id=uv-div></div>
     <input type="text" id="user" />
-    <input type="button" id="btnSearch" value="Search" ng-click="main()" />
-    <input type="text" id="results" />
+    <input type="button" id="btnSearch" value="Search"
+      ng-click="main(Document.getElementById('text').value)" />
 
     <script src="js/app.js"></script>
 
