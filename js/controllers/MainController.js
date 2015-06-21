@@ -7,6 +7,8 @@ app.controller('MainController',
                     //gitUrl = "./repos.json"
                     $http.get(gitUrl).then(function(resp) {
                       $scope.processRepos(username, resp.data)
+                    }, function(err) {
+                      document.getElementById("user").value = "Ran into GitHub throttling. Try again later.";
                     })
                   },
                   $scope.findNamed = function(arr, name) {
@@ -66,6 +68,8 @@ app.controller('MainController',
                           })
                           $scope.makeChart(user, repos, progmaps);
                         }
+                      }, function(err) {
+                        document.getElementById("user").value = "Ran into GitHub throttling. Try again later.";
                       })
                     });
                   },
