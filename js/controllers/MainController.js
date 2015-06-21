@@ -4,10 +4,9 @@ app.controller('MainController',
                   $scope.main = function () {
                     var username = document.getElementById("user").value
                     var gitUrl = $scope.github + "/users/" + username + "/repos"
-                    gitUrl = "./repos.json"
-                    console.log(gitUrl)
+                    //gitUrl = "./repos.json"
                     $http.get(gitUrl).then(function(resp) {
-                      $scope.repoCallback(resp.data)
+                      $scope.processRepos(username, resp.data)
                     })
                   },
                   $scope.findNamed = function(arr, name) {
@@ -19,7 +18,7 @@ app.controller('MainController',
                     })
                     return result
                   },
-                  $scope.repoCallback = function(repos) {
+                  $scope.processRepos = function(user, repos) {
                     console.log(repos)
                     var links = repos.map(function (repo) {
                       return repo.full_name;
@@ -29,25 +28,23 @@ app.controller('MainController',
                     });
                     var count = links.length;
                     var progmaps = {};
+                    repos.forEach(function(reponame) {
+                      progmaps[reponame] = []
+                    })
                     var langSet = []
                     links.forEach(function (link) {
                       //For each repo.
                       var langUrl = $scope.github + "/repos/" + link + "/languages"
+                      //langUrl = "./" + link + ".json"
                       var reponame = link.split("/")[1] 
-                      langUrl = "./" + link + ".json"
                       $http.get(langUrl).then(function(langs) {
                         var langs = langs.data
                         count--;
-                        if (Object.keys(langs).length > 0) {
-                          //Keep track of how much code was written in each language.
-                          Object.keys(langs).forEach(function (lang) {
-                            if (!progmaps.hasOwnProperty(reponame)) {
-                              progmaps[reponame] = []
-                            }
-                            progmaps[reponame].push({name: lang, value: langs[lang]})
-                            langSet.push(lang)
-                          });
-                        }
+                        //Keep track of how much code was written in each language.
+                        Object.keys(langs).forEach(function (lang) {
+                          progmaps[reponame].push({name: lang, value: langs[lang]})
+                          langSet.push(lang)
+                        });
                         if (count == 0) {
                           function onlyUnique(value, index, self) {
                             return self.indexOf(value) === index;
@@ -67,9 +64,9 @@ app.controller('MainController',
                               return langSet.indexOf(b.name) - langSet.indexOf(a.name)
                             })
                           })
-                          $scope.makeChart(repos, progmaps);
+                          $scope.makeChart(user, repos, progmaps);
                         }
-                      });
+                      })
                     });
                   },
 
@@ -89,22 +86,26 @@ app.controller('MainController',
                     });
                   },
 
-                  $scope.makeChart = function(order, data) {
+                  $scope.makeChart = function(user, order, data) {
+                    var uvDiv = document.getElementById("uv-div");
+                    while (uvDiv.firstChild) {
+                      uvDiv.removeChild(uvDiv.firstChild);
+                    }
                     var graphdef = {
                       categories : order,
                       dataset : data
                     }
                     var chart = uv.chart('StackedBar', graphdef, {
                       meta: {
-                        caption: 'Your Most Used Languages',
-                        subcaption: 'sorted by repo',
+                        caption: user + "'s Most Used Languages",
+                        subcaption: 'colored by repo',
                         hlabel: 'Size',
                         hsublabel: 'Bytes',
                         vlabel: 'Languages'
                       },
                       dimension: {
                         width: 600,
-                        height: 600
+                        height: 450
                       }
                     });
                   }
